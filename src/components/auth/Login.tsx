@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { UserRole } from "@/types";
+import { AGRICULTURAL_ITEMS, DAYS_OF_WEEK } from "@/constants/items";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,6 +21,8 @@ export default function Login() {
     mobile: "",
     email: "",
     role: "buyer" as UserRole,
+    preferredItems: [] as string[],
+    availableDays: [] as string[],
   });
   
   const [errors, setErrors] = useState({
@@ -76,7 +81,7 @@ export default function Login() {
       // Create user with basic info
       const userData = {
         ...formData,
-        id: `user-${Date.now()}`, // Simple ID generation
+        id: `user-${Date.now()}`,
       };
       
       // Store basic user info and redirect to role-specific registration
@@ -90,6 +95,16 @@ export default function Login() {
       }
     }
   };
+
+  const itemOptions = AGRICULTURAL_ITEMS.map(item => ({
+    label: item,
+    value: item,
+  }));
+
+  const dayOptions = DAYS_OF_WEEK.map(day => ({
+    label: day,
+    value: day,
+  }));
   
   return (
     <div 
@@ -182,6 +197,32 @@ export default function Login() {
                     </Label>
                   </div>
                 </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Preferred Items</Label>
+                <MultiSelect
+                  options={itemOptions}
+                  selected={formData.preferredItems}
+                  onChange={(selected) => 
+                    setFormData(prev => ({ ...prev, preferredItems: selected }))
+                  }
+                  placeholder="Select items you're interested in..."
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Available Days</Label>
+                <MultiSelect
+                  options={dayOptions}
+                  selected={formData.availableDays}
+                  onChange={(selected) => 
+                    setFormData(prev => ({ ...prev, availableDays: selected }))
+                  }
+                  placeholder="Select available days..."
+                  className="w-full"
+                />
               </div>
             </CardContent>
             

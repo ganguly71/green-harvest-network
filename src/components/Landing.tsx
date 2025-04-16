@@ -1,7 +1,6 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Leaf, ShoppingBag, TruckIcon, DollarSign, Handshake } from "lucide-react";
+import { ArrowRight, Leaf, ShoppingBag, TruckIcon, DollarSign, Handshake, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -172,6 +171,41 @@ export default function Landing() {
               <Link to="/register-buyer" className="text-white hover:text-green-400">For Buyers</Link>
               <Link to="/register-seller" className="text-white hover:text-green-400">For Farmers</Link>
             </div>
+          </div>
+          
+          <div className="flex justify-center space-x-6 mt-6">
+            <a 
+              href="https://facebook.com/greenharvest" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-white hover:text-green-400"
+            >
+              <Facebook size={24} />
+            </a>
+            <a 
+              href="https://instagram.com/greenharvest" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-white hover:text-green-400"
+            >
+              <Instagram size={24} />
+            </a>
+            <a 
+              href="https://twitter.com/greenharvest" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-white hover:text-green-400"
+            >
+              <Twitter size={24} />
+            </a>
+            <a 
+              href="https://linkedin.com/company/greenharvest" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-white hover:text-green-400"
+            >
+              <Linkedin size={24} />
+            </a>
           </div>
           
           <div className="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">

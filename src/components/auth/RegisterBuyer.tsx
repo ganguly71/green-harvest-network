@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { DAYS_OF_WEEK } from "@/constants/items";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function RegisterBuyer() {
   const navigate = useNavigate();
@@ -18,28 +17,24 @@ export default function RegisterBuyer() {
     location: "",
     openingTime: "09:00",
     closingTime: "18:00",
-    availableDays: [] as string[],
-    holidays: [] as string[],
+    availableDays: "",
+    holidays: "",
   });
   
   const [errors, setErrors] = useState({
     shopName: "",
     location: "",
+    availableDays: "",
+    holidays: "",
   });
   
-  // Use useEffect for navigation instead of navigating during render
   useEffect(() => {
     if (!user || user.role !== "buyer") {
       navigate("/");
     }
   }, [user, navigate]);
   
-  const dayOptions = DAYS_OF_WEEK.map(day => ({
-    label: day,
-    value: day,
-  }));
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
@@ -61,6 +56,11 @@ export default function RegisterBuyer() {
       newErrors.location = "Location is required";
       isValid = false;
     }
+
+    if (!formData.availableDays.trim()) {
+      newErrors.availableDays = "Working days are required";
+      isValid = false;
+    }
     
     setErrors(newErrors);
     return isValid;
@@ -80,7 +80,6 @@ export default function RegisterBuyer() {
     }
   };
   
-  // If user is not valid, return null early after the navigation effect is triggered
   if (!user || user.role !== "buyer") {
     return null;
   }
@@ -165,33 +164,34 @@ export default function RegisterBuyer() {
               </div>
               
               <div className="space-y-2">
-                <Label>Working Days</Label>
-                <MultiSelect
-                  options={dayOptions}
-                  selected={formData.availableDays}
-                  onChange={(selected) => 
-                    setFormData(prev => ({ ...prev, availableDays: selected }))
-                  }
-                  placeholder="Select working days"
-                  className="w-full"
+                <Label htmlFor="availableDays">Working Days</Label>
+                <Textarea
+                  id="availableDays"
+                  name="availableDays"
+                  placeholder="Enter working days (e.g., Monday, Tuesday, Wednesday)"
+                  value={formData.availableDays}
+                  onChange={handleChange}
+                  className={errors.availableDays ? "border-red-500" : ""}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Select the days your shop is open
+                  Enter the days your shop is open, separated by commas
                 </p>
+                {errors.availableDays && (
+                  <p className="text-sm text-red-500">{errors.availableDays}</p>
+                )}
               </div>
               
               <div className="space-y-2">
-                <Label>Weekly Holidays</Label>
-                <MultiSelect
-                  options={dayOptions}
-                  selected={formData.holidays}
-                  onChange={(selected) => 
-                    setFormData(prev => ({ ...prev, holidays: selected }))
-                  }
-                  placeholder="Select holidays"
+                <Label htmlFor="holidays">Weekly Holidays</Label>
+                <Textarea
+                  id="holidays"
+                  name="holidays"
+                  placeholder="Enter holidays (e.g., Sunday)"
+                  value={formData.holidays}
+                  onChange={handleChange}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Select the days your shop remains closed
+                  Enter the days your shop remains closed, separated by commas
                 </p>
               </div>
             </CardContent>

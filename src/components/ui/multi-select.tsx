@@ -21,23 +21,28 @@ interface MultiSelectProps {
 
 export function MultiSelect({
   options,
-  selected,
+  selected = [], // Ensure default value
   onChange,
   placeholder = "Select options",
   className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
 
+  // Ensure options is always an array
+  const safeOptions = Array.isArray(options) ? options : [];
+  // Ensure selected is always an array
+  const safeSelected = Array.isArray(selected) ? selected : [];
+
   const handleSelect = (value: string) => {
-    if (selected.includes(value)) {
-      onChange(selected.filter((item) => item !== value));
+    if (safeSelected.includes(value)) {
+      onChange(safeSelected.filter((item) => item !== value));
     } else {
-      onChange([...selected, value]);
+      onChange([...safeSelected, value]);
     }
   };
 
   const handleRemove = (value: string) => {
-    onChange(selected.filter((item) => item !== value));
+    onChange(safeSelected.filter((item) => item !== value));
   };
 
   return (
@@ -51,17 +56,17 @@ export function MultiSelect({
             className
           )}
         >
-          {selected.length === 0 ? (
+          {safeSelected.length === 0 ? (
             <span className="text-muted-foreground">{placeholder}</span>
           ) : (
             <div className="flex flex-wrap gap-1">
-              {selected.map((value) => (
+              {safeSelected.map((value) => (
                 <Badge
                   key={value}
                   variant="secondary"
                   className="flex items-center gap-1"
                 >
-                  {options.find(option => option.value === value)?.label || value}
+                  {safeOptions.find(option => option.value === value)?.label || value}
                   <button
                     type="button"
                     className="rounded-full outline-none focus:ring-2 focus:ring-ring"
@@ -83,7 +88,7 @@ export function MultiSelect({
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No options found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
-            {options.map((option) => (
+            {safeOptions.map((option) => (
               <CommandItem
                 key={option.value}
                 value={option.value}
@@ -92,12 +97,12 @@ export function MultiSelect({
                 <div
                   className={cn(
                     "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                    selected.includes(option.value)
+                    safeSelected.includes(option.value)
                       ? "bg-primary text-primary-foreground"
                       : "opacity-50 [&_svg]:invisible"
                   )}
                 >
-                  {selected.includes(option.value) && (
+                  {safeSelected.includes(option.value) && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"

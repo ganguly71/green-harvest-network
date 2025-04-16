@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,6 @@ import { DAYS_OF_WEEK } from "@/constants/items";
 export default function RegisterBuyer() {
   const navigate = useNavigate();
   const { user, registerBuyer } = useAuth();
-  
-  if (!user || user.role !== "buyer") {
-    navigate("/");
-    return null;
-  }
   
   const [formData, setFormData] = useState({
     shopName: "",
@@ -31,6 +26,13 @@ export default function RegisterBuyer() {
     shopName: "",
     location: "",
   });
+  
+  // Use useEffect for navigation instead of navigating during render
+  useEffect(() => {
+    if (!user || user.role !== "buyer") {
+      navigate("/");
+    }
+  }, [user, navigate]);
   
   const dayOptions = DAYS_OF_WEEK.map(day => ({
     label: day,
@@ -77,6 +79,11 @@ export default function RegisterBuyer() {
       navigate("/buyer-dashboard");
     }
   };
+  
+  // If user is not valid, return null early after the navigation effect is triggered
+  if (!user || user.role !== "buyer") {
+    return null;
+  }
   
   return (
     <div 

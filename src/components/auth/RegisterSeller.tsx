@@ -1,20 +1,18 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { AGRICULTURAL_ITEMS } from "@/constants/items";
 
 export default function RegisterSeller() {
   const navigate = useNavigate();
   const { user, registerSeller } = useAuth();
   
-  // Redirect if no basic user info or wrong role
   if (!user || user.role !== "seller") {
     navigate("/");
     return null;
@@ -24,6 +22,7 @@ export default function RegisterSeller() {
     address: "",
     crops: [] as string[],
     harvestSeason: "",
+    preferredItems: [] as string[],
   });
   
   const [errors, setErrors] = useState({
@@ -53,7 +52,6 @@ export default function RegisterSeller() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Clear error when user types
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -72,6 +70,11 @@ export default function RegisterSeller() {
       setErrors((prev) => ({ ...prev, harvestSeason: "" }));
     }
   };
+  
+  const itemOptions = AGRICULTURAL_ITEMS.map(item => ({
+    label: item,
+    value: item,
+  }));
   
   const validateForm = () => {
     let isValid = true;
@@ -100,14 +103,12 @@ export default function RegisterSeller() {
     e.preventDefault();
     
     if (validateForm()) {
-      // Register as seller with complete info
       registerSeller({
         ...user,
         ...formData,
         role: "seller",
       });
       
-      // Redirect to seller dashboard
       navigate("/seller-dashboard");
     }
   };
@@ -187,6 +188,22 @@ export default function RegisterSeller() {
                 {errors.harvestSeason && (
                   <p className="text-sm text-red-500">{errors.harvestSeason}</p>
                 )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Items You Sell</Label>
+                <MultiSelect
+                  options={itemOptions}
+                  selected={formData.preferredItems}
+                  onChange={(selected) => 
+                    setFormData(prev => ({ ...prev, preferredItems: selected }))
+                  }
+                  placeholder="Select items you sell"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Select all items that you regularly sell
+                </p>
               </div>
             </CardContent>
             

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -7,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { DAYS_OF_WEEK } from "@/constants/items";
 
 export default function RegisterBuyer() {
   const navigate = useNavigate();
   const { user, registerBuyer } = useAuth();
   
-  // Redirect if no basic user info or wrong role
   if (!user || user.role !== "buyer") {
     navigate("/");
     return null;
@@ -23,6 +22,7 @@ export default function RegisterBuyer() {
     location: "",
     openingTime: "09:00",
     closingTime: "18:00",
+    availableDays: [] as string[],
     holidays: [] as string[],
   });
   
@@ -41,11 +41,15 @@ export default function RegisterBuyer() {
     { label: "Sunday", value: "Sunday" },
   ];
   
+  const dayOptions = DAYS_OF_WEEK.map(day => ({
+    label: day,
+    value: day,
+  }));
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Clear error when user types
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -77,14 +81,12 @@ export default function RegisterBuyer() {
     e.preventDefault();
     
     if (validateForm()) {
-      // Register as buyer with complete info
       registerBuyer({
         ...user,
         ...formData,
         role: "buyer",
       });
       
-      // Redirect to buyer dashboard
       navigate("/buyer-dashboard");
     }
   };
@@ -166,6 +168,22 @@ export default function RegisterBuyer() {
                     onChange={handleChange}
                   />
                 </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Working Days</Label>
+                <MultiSelect
+                  options={dayOptions}
+                  selected={formData.availableDays}
+                  onChange={(selected) => 
+                    setFormData(prev => ({ ...prev, availableDays: selected }))
+                  }
+                  placeholder="Select working days"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Select the days your shop is open
+                </p>
               </div>
               
               <div className="space-y-2">

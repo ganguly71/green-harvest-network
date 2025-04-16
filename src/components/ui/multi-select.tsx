@@ -79,7 +79,7 @@ export function MultiSelect({
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command>
+        <Command className="w-full">
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No options found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">

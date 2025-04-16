@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -31,16 +32,6 @@ export default function RegisterBuyer() {
     location: "",
   });
   
-  const weekdays = [
-    { label: "Monday", value: "Monday" },
-    { label: "Tuesday", value: "Tuesday" },
-    { label: "Wednesday", value: "Wednesday" },
-    { label: "Thursday", value: "Thursday" },
-    { label: "Friday", value: "Friday" },
-    { label: "Saturday", value: "Saturday" },
-    { label: "Sunday", value: "Sunday" },
-  ];
-  
   const dayOptions = DAYS_OF_WEEK.map(day => ({
     label: day,
     value: day,
@@ -53,10 +44,6 @@ export default function RegisterBuyer() {
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  };
-  
-  const handleHolidaysChange = (selectedHolidays: string[]) => {
-    setFormData((prev) => ({ ...prev, holidays: selectedHolidays }));
   };
   
   const validateForm = () => {
@@ -189,9 +176,11 @@ export default function RegisterBuyer() {
               <div className="space-y-2">
                 <Label>Weekly Holidays</Label>
                 <MultiSelect
-                  options={weekdays}
+                  options={dayOptions}
                   selected={formData.holidays}
-                  onChange={handleHolidaysChange}
+                  onChange={(selected) => 
+                    setFormData(prev => ({ ...prev, holidays: selected }))
+                  }
                   placeholder="Select holidays"
                 />
                 <p className="text-xs text-muted-foreground mt-1">

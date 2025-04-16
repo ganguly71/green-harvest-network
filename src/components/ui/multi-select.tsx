@@ -44,6 +44,9 @@ export function MultiSelect({
   const handleRemove = (value: string) => {
     onChange(safeSelected.filter((item) => item !== value));
   };
+  
+  // Fix for the Command component - provide a key
+  const commandKey = React.useId();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -84,7 +87,7 @@ export function MultiSelect({
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command className="w-full">
+        <Command key={commandKey} className="w-full">
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>No options found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">

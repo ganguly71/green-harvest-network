@@ -1,28 +1,22 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MultiSelect } from "@/components/ui/multi-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AGRICULTURAL_ITEMS } from "@/constants/items";
 
 export default function RegisterSeller() {
   const navigate = useNavigate();
   const { user, registerSeller } = useAuth();
   
-  if (!user || user.role !== "seller") {
-    navigate("/");
-    return null;
-  }
-  
   const [formData, setFormData] = useState({
     address: "",
-    crops: [] as string[],
+    crops: "",
     harvestSeason: "",
-    preferredItems: [] as string[],
+    preferredItems: "",
   });
   
   const [errors, setErrors] = useState({
@@ -31,20 +25,11 @@ export default function RegisterSeller() {
     harvestSeason: "",
   });
   
-  const cropOptions = [
-    { label: "Tomatoes", value: "Tomatoes" },
-    { label: "Potatoes", value: "Potatoes" },
-    { label: "Onions", value: "Onions" },
-    { label: "Carrots", value: "Carrots" },
-    { label: "Cucumbers", value: "Cucumbers" },
-    { label: "Leafy Greens", value: "Leafy Greens" },
-    { label: "Cabbage", value: "Cabbage" },
-    { label: "Peppers", value: "Peppers" },
-    { label: "Eggplant", value: "Eggplant" },
-    { label: "Beans", value: "Beans" },
-    { label: "Corn", value: "Corn" },
-    { label: "Pumpkin", value: "Pumpkin" },
-  ];
+  useEffect(() => {
+    if (!user || user.role !== "seller") {
+      navigate("/");
+    }
+  }, [user, navigate]);
   
   const seasons = ["Spring", "Summer", "Fall", "Winter", "Year-round"];
   
@@ -57,24 +42,12 @@ export default function RegisterSeller() {
     }
   };
   
-  const handleCropsChange = (selectedCrops: string[]) => {
-    setFormData((prev) => ({ ...prev, crops: selectedCrops }));
-    if (selectedCrops.length > 0 && errors.crops) {
-      setErrors((prev) => ({ ...prev, crops: "" }));
-    }
-  };
-  
   const handleSeasonChange = (season: string) => {
     setFormData((prev) => ({ ...prev, harvestSeason: season }));
     if (season && errors.harvestSeason) {
       setErrors((prev) => ({ ...prev, harvestSeason: "" }));
     }
   };
-  
-  const itemOptions = AGRICULTURAL_ITEMS.map(item => ({
-    label: item,
-    value: item,
-  }));
   
   const validateForm = () => {
     let isValid = true;
@@ -85,8 +58,8 @@ export default function RegisterSeller() {
       isValid = false;
     }
     
-    if (formData.crops.length === 0) {
-      newErrors.crops = "Please select at least one crop";
+    if (!formData.crops.trim()) {
+      newErrors.crops = "Please enter at least one crop";
       isValid = false;
     }
     
@@ -103,15 +76,34 @@ export default function RegisterSeller() {
     e.preventDefault();
     
     if (validateForm()) {
+      // Process crops as an array from comma-separated string
+      const cropsArray = formData.crops
+        .split(',')
+        .map(crop => crop.trim())
+        .filter(crop => crop.length > 0);
+      
+      // Process preferred items as an array from comma-separated string
+      const preferredItemsArray = formData.preferredItems
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+      
       registerSeller({
         ...user,
-        ...formData,
+        address: formData.address,
+        crops: cropsArray,
+        harvestSeason: formData.harvestSeason,
+        preferredItems: preferredItemsArray,
         role: "seller",
       });
       
       navigate("/seller-dashboard");
     }
   };
+  
+  if (!user || user.role !== "seller") {
+    return null;
+  }
   
   return (
     <div 
@@ -155,14 +147,19 @@ export default function RegisterSeller() {
               </div>
               
               <div className="space-y-2">
-                <Label>Crops You Grow</Label>
-                <MultiSelect
-                  options={cropOptions}
-                  selected={formData.crops}
-                  onChange={handleCropsChange}
-                  placeholder="Select crops"
+                <Label htmlFor="crops">Crops You Grow</Label>
+                <Textarea
+                  id="crops"
+                  name="crops"
+                  placeholder="Enter crops separated by commas (e.g., Tomatoes, Potatoes, Onions)"
+                  value={formData.crops}
+                  onChange={handleChange}
                   className={errors.crops ? "border-red-500" : ""}
+                  rows={3}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enter the crops you grow, separated by commas
+                </p>
                 {errors.crops && (
                   <p className="text-sm text-red-500">{errors.crops}</p>
                 )}
@@ -191,18 +188,17 @@ export default function RegisterSeller() {
               </div>
               
               <div className="space-y-2">
-                <Label>Items You Sell</Label>
-                <MultiSelect
-                  options={itemOptions}
-                  selected={formData.preferredItems}
-                  onChange={(selected) => 
-                    setFormData(prev => ({ ...prev, preferredItems: selected }))
-                  }
-                  placeholder="Select items you sell"
-                  className="w-full"
+                <Label htmlFor="preferredItems">Items You Sell</Label>
+                <Textarea
+                  id="preferredItems"
+                  name="preferredItems"
+                  placeholder="Enter items you sell, separated by commas"
+                  value={formData.preferredItems}
+                  onChange={handleChange}
+                  rows={3}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Select all items that you regularly sell
+                  Enter all items that you regularly sell, separated by commas
                 </p>
               </div>
             </CardContent>

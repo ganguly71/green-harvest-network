@@ -70,9 +70,20 @@ export default function RegisterBuyer() {
     e.preventDefault();
     
     if (validateForm()) {
+      // Process holidays as an array from comma-separated string
+      const holidaysArray = formData.holidays
+        .split(',')
+        .map(day => day.trim())
+        .filter(day => day.length > 0);
+      
       registerBuyer({
         ...user,
-        ...formData,
+        shopName: formData.shopName,
+        location: formData.location,
+        openingTime: formData.openingTime,
+        closingTime: formData.closingTime,
+        availableDays: formData.availableDays,
+        holidays: holidaysArray,
         role: "buyer",
       });
       
